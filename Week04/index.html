@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ヨーロッパ主要政党マップ</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <script src="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 100px; bottom: 0; width: 100%; }
+        #country-selector, #ideology-selector {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        #ideology-selector {
+            top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <select id="country-selector">
+        <option value="">国を選択</option>
+        <option value="フランス">フランス</option>
+        <option value="ドイツ">ドイツ</option>
+        <option value="イギリス">イギリス</option>
+        <option value="スペイン">スペイン</option>
+        <option value="ポーランド">ポーランド</option>
+        <option value="イタリア">イタリア</option>
+        <option value="ロシア">ロシア</option>
+        <option value="トルコ">トルコ</option>
+        <option value="ウクライナ">ウクライナ</option>
+    </select>
+    <select id="ideology-selector">
+        <option value="">イデオロギーを選択</option>
+        <option value="リベラル">リベラル</option>
+        <option value="保守">保守</option>
+        <option value="社会民主主義">社会民主主義</option>
+        <option value="国民保守主義">国民保守主義</option>
+        <option value="中道右派">中道右派</option>
+        <option value="権威主義">権威主義</option>
+    </select>
+    <div id="map"></div>
+    <script>
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: {
+                version: 8,
+                sources: {
+                    'google-tiles': {
+                        type: 'raster',
+                        tiles: ['https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'],
+                        tileSize: 256
+                    },
+                    'europe-countries': {
+                        type: 'geojson',
+                        data: 'europe_simple.geojson'
+                    }
+                },
+                layers: [
+                    {
+                        id: 'google-tiles-layer',
+                        type: 'raster',
+                        source: 'google-tiles',
+                        minzoom: 0,
+                        maxzoom: 19
+                    },
+                    {
+                        id: 'europe-ideologies-layer',
+                        type: 'fill',
+                        source: 'europe-countries',
+                        paint: {
+                            'fill-color': [
+                                'match',
+                                ['get', 'ideology'],
+                                'リベラル', '#007bff',
+                                '保守', '#dc3545',
+                                '社会民主主義', '#28a745',
+                                '国民保守主義', '#6495ED',
+                                '中道右派', '#ffc107',
+                                '権威主義', '#343a40',
+                                '#ccc'
+                            ],
+                            'fill-opacity': 0.7,
+                            'fill-outline-color': '#333'
+                        },
+                        filter: ['all', ['==', ['get', 'country'], ''], ['==', ['get', 'ideology'], '']]
+                    }
+                ]
+            },
+            center: [15, 50],
+            zoom: 3
+        });
+
+        const countrySelector = document.getElementById('country-selector');
+        const ideologySelector = document.getElementById('ideology-selector');
+        const popup = new maplibregl.Popup({
+            closeButton: false,
+            closeOnClick: false
+        });
+
+        countrySelector.addEventListener('change', (event) => {
+            const selectedCountry = event.target.value;
+            const selectedIdeology = ideologySelector.value;
+            updateFilter(selectedCountry, selectedIdeology);
+
+            // 地図を選択した国に移動
+            const source = map.getSource('europe-countries');
+            if (source && source._data && source._data.features) {
+                const countryFeature = source._data.features.find(feature => feature.properties.country === selectedCountry);
+                if (countryFeature && countryFeature.properties.center) {
+                    console.log('選択された国:', selectedCountry);
+const source = map.getSource('europe-countries');
+if (source && source._data && source._data.features) {
+    const countryFeature = source._data.features.find(feature => feature.properties.country === selectedCountry);
+    console.log('countryFeature:', countryFeature);
+    if (countryFeature && countryFeature.properties.center) {
+        console.log('center:', countryFeature.properties.center);
+        map.flyTo({ center: countryFeature.properties.center, zoom: 5 });
+    } else {
+        console.log('中心座標が見つかりません:', selectedCountry);
+        map.flyTo({ center: [15, 50], zoom: 3 });
+    }
+}
+                    map.flyTo({ center: countryFeature.properties.center, zoom: 5 });
+                } else if (selectedCountry === "") {
+                    map.flyTo({ center: [15, 50], zoom: 3 });
+                }
+            }
+        });
+
+        ideologySelector.addEventListener('change', (event) => {
+            const selectedCountry = countrySelector.value;
+            const selectedIdeology = event.target.value;
+            updateFilter(selectedCountry, selectedIdeology);
+        });
+
+        function updateFilter(country, ideology) {
+            const filters = ['all'];
+            if (country) {
+                filters.push(['==', ['get', 'country'], country]);
+            }
+            if (ideology) {
+                filters.push(['==', ['get', 'ideology'], ideology]);
+            } else if (!country) {
+                filters.push(['!=', ['get', 'ideology'], '']);
+            } else if (country && !ideology) {
+                filters.push(['==', ['get', 'country'], country]);
+            }
+            map.setFilter('europe-ideologies-layer', filters);
+        }
+
+        map.on('click', 'europe-ideologies-layer', (e) => {
+            if (e.features.length > 0) {
+                const feature = e.features[0];
+                const countryName = feature.properties.country;
+                const majorParty = feature.properties.major_party;
+                const ideology = feature.properties.ideology;
+
+                popup.setLngLat(e.lngLat)
+                    .setHTML(`<strong>${countryName}</strong><br>主要政党: ${majorParty}<br>イデオロギー: ${ideology}`)
+                    .addTo(map);
+            }
+        });
+
+        map.on('mouseenter', 'europe-ideologies-layer', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        map.on('mouseleave', 'europe-ideologies-layer', () => {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [[-5, 42], [9, 42], [9, 51], [-5, 51], [-5, 42]] // フランス (概算)
+        ]
+      },
+      "properties": {
+        "country": "フランス",
+        "ideology": "リベラル",
+        "major_party": "共和国前進",
+        "center": [2.35, 46.5]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [[5, 47], [15, 47], [15, 55], [5, 55], [5, 47]] // ドイツ (概算)
+        ]
+      },
+      "properties": {
+        "country": "ドイツ",
+        "ideology": "保守",
+        "major_party": "ドイツキリスト教民主同盟",
+        "center": [10, 51]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [[-9, 50], [2, 50], [2, 59], [-9, 59], [-9, 50]] // イギリス (概算)
+        ]
+      },
+      "properties": {
+        "country": "イギリス",
+        "ideology": "保守",
+        "major_party": "保守党",
+        "center": [-3.5, 54.5]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [[-10, 36], [5, 36], [5, 44], [-10, 44], [-10, 36]] // スペイン (概算)
+        ]
+      },
+      "properties": {
+        "country": "スペイン",
+        "ideology": "社会民主主義",
+        "major_party": "スペイン社会労働党",
+        "center": [-4, 40]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [[6, 35], [19, 35], [19, 47], [6, 47], [6, 35]] // イタリア (概算)
+        ]
+      },
+      "properties": {
+        "country": "イタリア",
+        "ideology": "中道右派",
+        "major_party": "イタリアの同胞",
+        "center": [12, 42]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [[14, 49], [24, 49], [24, 55], [14, 55], [14, 49]] // ポーランド (概算)
+        ]
+      },
+      "properties": {
+        "country": "ポーランド",
+        "ideology": "国民保守主義",
+        "major_party": "法と正義",
+        "center": [19, 52]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [25, 40], [45, 40], [45, 65], [25, 65], [25, 40]] // ロシア (ヨーロッパ部分 - 概算)
+        ]
+      },
+      "properties": {
+        "country": "ロシア",
+        "ideology": "権威主義",
+        "major_party": "統一ロシア",
+        "center": [35, 53]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [[25, 39], [30, 39], [30, 43], [25, 43], [25, 39]] // トルコ (ヨーロッパ部分 - 概算)
+        ]
+      },
+      "properties": {
+        "country": "トルコ",
+        "ideology": "国民保守主義",
+        "major_party": "公正発展党",
+        "center": [27.5, 41]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates":
