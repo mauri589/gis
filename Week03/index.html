@@ -11,7 +11,7 @@
 
   <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
   <script>
-   const map = new maplibregl.Map({
+    const map = new maplibregl.Map({
   container: 'map',
   style: {
     "version": 8,
@@ -35,15 +35,63 @@
       }
     ]
   },
-  center: [138.6349, 36.3425],
-  zoom: 12
+  center: [139.9207, 35.8255],
+  zoom: 14
 });
 
     // ポップアップ（吹き出し）を追加
     const popup = new maplibregl.Popup({ offset: 25 })
-      .setLngLat([139.7671, 35.6812])
-      .setHTML("<h3>Hello world!</h3><p>Greetings from Japan!🇯🇵</p>")
+      .setLngLat([139.9207, 35.8255])
+      .setHTML("<h3>This is my neighborhood!</h3><p>Hi from Matsudo</p>")
+      .setLngLat([138.6349, 36.3425])
+      .setHTML("<h3>My favorite place in Japan</h3><p>Karuizawa</p>")
+  
       .addTo(map);
+
+      const locations = [
+  { lng: 139.9207, lat: 35.8255, name: "新松戸" },
+  { lng: 138.6349, lat: 36.3425, name: "軽井沢" },
+  
+];
+
+locations.forEach(loc => {
+  new maplibregl.Marker()
+    .setLngLat([loc.lng, loc.lat])
+    .setPopup(
+      new maplibregl.Popup().setHTML(`<h3>${loc.name}</h3>`)
+    )
+    .addTo(map);
+});
+ 
+const bounds = new maplibregl.LngLatBounds();
+locations.forEach(loc => bounds.extend([loc.lng, loc.lat]));
+map.fitBounds(bounds, { padding: 50 });
+
+map.on('load', () => {
+  map.addSource('route', {
+    type: 'geojson',
+    data: {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+          [139.9207, 35.8255], // 新松戸
+          [138.6349, 36.3425]  // 軽井沢
+        ]
+      }
+    }
+  });
+
+  map.addLayer({
+    id: 'route-line',
+    type: 'line',
+    source: 'route',
+    paint: {
+      'line-color': '#ff0000',
+      'line-width': 4
+    }
+  });
+});
   </script>
 </body>
 </html>
