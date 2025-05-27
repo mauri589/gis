@@ -1,0 +1,207 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Japan",
+        "iso_a3": "JPN"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [140.4077, 36.3197],
+              [140.4077, 36.3197],
+              [140.4077, 36.3197],
+              [140.4077, 36.3197],
+              [140.4077, 36.3197]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "United States",
+        "iso_a3": "USA"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [-124.733, 49.000],
+              [-124.733, 49.000],
+              [-124.733, 49.000],
+              [-124.733, 49.000],
+              [-124.733, 49.000]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "China",
+        "iso_a3": "CHN"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [73.559, 49.208],
+              [73.559, 49.208],
+              [73.559, 49.208],
+              [73.559, 49.208],
+              [73.559, 49.208]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Russia",
+        "iso_a3": "RUS"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [19.646, 81.821],
+              [19.646, 81.821],
+              [19.646, 81.821],
+              [19.646, 81.821],
+              [19.646, 81.821]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Brazil",
+        "iso_a3": "BRA"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-73.987, -4.200],
+            [-73.987, -4.200],
+            [-73.987, -4.200],
+            [-73.987, -4.200],
+            [-73.987, -4.200]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Canada",
+        "iso_a3": "CAN"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [-141.002, 60.301],
+              [-141.002, 60.301],
+              [-141.002, 60.301],
+              [-141.002, 60.301],
+              [-141.002, 60.301]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Germany",
+        "iso_a3": "DEU"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [6.000, 50.000],
+            [6.000, 50.000],
+            [6.000, 50.000],
+            [6.000, 50.000],
+            [6.000, 50.000]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "France",
+        "iso_a3": "FRA"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [2.000, 47.000],
+            [2.000, 47.000],
+            [2.000, 47.000],
+            [2.000, 47.000],
+            [2.000, 47.000]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "United Kingdom",
+        "iso_a3": "GBR"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [-5.000, 55.000],
+              [-5.000, 55.000],
+              [-5.000, 55.000],
+              [-5.000, 55.000],
+              [-5.000, 55.000]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "India",
+        "iso_a3": "IND"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [77.000, 20.000],
+            [77.000, 20.000],
+            [77.000, 20.000],
+            [77.000, 20.000],
+            [77.000, 20.000]
+          ]
+        ]
+      }
+    }
+  ]
+}
