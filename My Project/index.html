@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>世界のイデオロギー分布マップ</title>
+    <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; font-family: sans-serif; overflow: hidden; }
+        #map { width: 100%; height: 100vh; }
+        #legend {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(255,255,255,0.9); padding: 10px; border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 1; font-size: 0.9em;
+        }
+        .legend-item { display: flex; align-items: center; margin-bottom: 5px; }
+        .legend-color { width: 20px; height: 20px; margin-right: 8px; border: 1px solid #ccc; }
+        #controls {
+            position: absolute; top: 10px; left: 10px;
+            background: rgba(255,255,255,0.9); padding: 15px; border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 1;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+        .control-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        .control-group select {
+            padding: 8px 10px; border-radius: 4px; border: 1px solid #ccc;
+            width: 180px; font-size: 1em;
+        }
+        .control-group button {
+            padding: 8px 12px; border-radius: 4px; border: none;
+            background: #007bff; color: white; cursor: pointer; margin-left: 8px; font-size: 0.95em;
+            transition: background-color 0.2s ease;
+        }
+        .control-group button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="legend">
+        <h4>イデオロギー凡例</h4>
+        <div id="legend-content"></div>
+    </div>
+    <div id="controls">
+        <div class="control-group">
+            <label for="country-select">国を選択して移動:</label>
+            <select id="country-select">
+                <option value="">国を選択してください</option>
+            </select>
+            <button id="go-to-country">移動</button>
+        </div>
+    </div>
+    <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+    <script>
+    // --- データ定義 ---
+    const ideologyData = {
+        'USA': { name_ja: 'アメリカ合衆国', ideology: '自由主義' },
+        'JPN': { name_ja: '日本', ideology: '保守主義' },
+        'CHN': { name_ja: '中華人民共和国', ideology: '社会主義（共産主義）' },
+        'RUS': { name_ja: 'ロシア連邦', ideology: '権威主義' },
+        'FRA': { name_ja: 'フランス', ideology: '社会民主主義' },
+        'DEU': { name_ja: 'ドイツ', ideology: '社会民主主義' },
+        // ... 必要に応じて追加 ...
+    };
+    const ideologyColors = {
+        '自由主義': '#FFD700',
+        '社会民主主義': '#FF6347',
+        '保守主義': '#1E90FF',
+        '社会主義（共産主義）': '#DC143C',
+        '権威主義': '#6A5ACD',
+        '未分類': '#D3D3D3'
+    };
+
+    // --- マップ初期化 ---
+    const map = new maplibregl.Map({
+        container: 'map', //
+        style: {
+            version: 8,
+            sources: {
+                'countries': {
+                    type: 'geojson',
+                    data: './countries.geojson'
+                }
+            },
+            layers: [
+                //
+           
+                {
+                    id: 'country-fills',
+                    type: 'fill',
+                    source: 'countries',
+                    paint: {
+                        'fill-color': [
+                            'match',
+                            ['get', 'iso_a3'],
+                            ...Object.entries(ideologyData).flatMap(([iso_a3, data]) => [iso_a3, ideologyColors[data.ideology] || ideologyColors['未分類']]),
+                            ideologyColors['未分類']
+                        ],
+                        'fill-opacity': 0.7
+                    }
+                },
+                {
+                    id: 'country-borders',
+                    type: 'line',
+                    source: 'countries',
+                    paint: { 'line-color': '#FFFFFF', 'line-width': 0.5 }
+                }
+            ]
+        },
+        center: [0, 20],
+        zoom: 1
+    });
+
+    // --- UI要素取得 ---
+    const countrySelect = document.getElementById('country-select');
+    const goToCountryButton = document.getElementById('go-to-country');
+    const legendContent = document.getElementById('legend-content');
+    let allCountriesGeoJSON = null;
+
+    // --- GeoJSONロードとドロップダウン初期化 ---
+    map.on('load', () => {
+        fetch('./countries.geojson')
+            .then(res => res.json())
+            .then(geojson => {
+                allCountriesGeoJSON = geojson;
+                // ドロップダウン初期化
+                const countriesForSelect = [];
+                geojson.features.forEach(feature => {
+                   
+                    const iso_a3 = feature.properties.iso_a3 || feature.properties.properties_iso_a3 || feature.properties.ADM0_A3;
+                    let countryNameForDisplay = '不明な国';
+                    if (iso_a3 && ideologyData[iso_a3] && ideologyData[iso_a3].name_ja) {
+                        countryNameForDisplay = ideologyData[iso_a3].name_ja;
+                    } else {
+                        countryNameForDisplay = feature.properties.name || feature.properties.NAME || feature.properties.FORMAL_EN || '不明な国';
+                    }
+                    if (iso_a3 && feature.geometry) {
+                        countriesForSelect.push({ name_ja: countryNameForDisplay, iso_a3: iso_a3, geometry: feature.geometry });
+                    }
+                });
+                countriesForSelect.sort((a, b) => a.name_ja.localeCompare(b.name_ja, 'ja'));
+                countriesForSelect.forEach(country => {
+                    const option = document.createElement('option');
+                    option.value = country.iso_a3;
+                    option.textContent = country.name_ja;
+                    countrySelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                alert('国境線データの読み込みに失敗しました。');
+                console.error(error);
+            });
+
+        // --- 凡例生成 ---
+        if (legendContent) {
+            for (const [ideology, color] of Object.entries(ideologyColors)) {
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                item.innerHTML = `<div class="legend-color" style="background-color: ${color};"></div><div>${ideology}</div>`;
+                legendContent.appendChild(item);
+            }
+        }
+    });
+
+    // --- 「移動」ボタンのイベントリスナー（重複禁止！） ---
+    goToCountryButton.addEventListener('click', () => {
+        const selectedIso_a3 = countrySelect.value;
+        if (!selectedIso_a3) {
+            alert('国を選択してください。');
+            return;
+        }
+        if (!allCountriesGeoJSON) {
+            alert('国データがまだ読み込まれていません。');
+            return;
+        }
+        const selectedFeature = allCountriesGeoJSON.features.find(feature =>
+            (feature.properties.iso_a3 || feature.properties.properties_iso_a3 || feature.properties.ADM0_A3) === selectedIso_a3
+        );
+        if (selectedFeature && selectedFeature.geometry) {
+            const bbox = turf.bbox(selectedFeature.geometry);
+            map.fitBounds(bbox, { padding: 50, duration: 1500, maxZoom: 7 });
+            // ポップアップ
+            const centroid = turf.centroid(selectedFeature.geometry);
+            const lngLat = centroid.geometry.coordinates;
+            let countryNameDisplay = '不明な国';
+            let ideologyDisplay = '未分類';
+            if (selectedIso_a3 && ideologyData[selectedIso_a3]) {
+                countryNameDisplay = ideologyData[selectedIso_a3].name_ja;
+                ideologyDisplay = ideologyData[selectedIso_a3].ideology;
+            } else {
+                countryNameDisplay = selectedFeature.properties.name || selectedFeature.properties.NAME || selectedFeature.properties.FORMAL_EN || '不明な国';
+            }
+            new maplibregl.Popup()
+                .setLngLat(lngLat)
+                .setHTML(`<strong>${countryNameDisplay}</strong><br>イデオロギー: ${ideologyDisplay}`)
+                .addTo(map);
+        } else {
+            alert('選択された国の地理情報が見つかりませんでした。');
+        }
+    });
+    </script>
+</body>
+</html>

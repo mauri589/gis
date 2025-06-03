@@ -104,21 +104,56 @@
         // --- データ定義 ---
         // 各国のイデオロギーデータ (ISO 3文字コードをキーとするダミーデータです。実際には独自の正確なデータに置き換えてください)
         const ideologyData = {
-            'USA': '自由主義', 'CAN': '自由主義', 'GBR': '自由主義', 'FRA': '社会民主主義',
-            'DEU': '社会民主主義', 'JPN': '保守主義', 'CHN': '社会主義（共産主義）',
-            'RUS': '権威主義', 'IND': '多元主義', 'BRA': '社会民主民主主義',
-            'AUS': '自由主義', 'ZAF': '社会民主主義', 'SAU': 'イスラム主義（君主制）',
-            'IRN': 'イスラム主義（共和制）', 'PRK': '全体主義', 'SWE': '社会民主主義',
-            'NOR': '社会民主主義', 'ESP': '社会民主主義', 'ITA': '社会民主主義',
-            'MEX': '自由主義', 'ARG': 'ポピュリズム', 'EGY': 'イスラム主義（軍政）',
-            'NGA': '多元主義', 'VNM': '社会主義（共産主義）', 'CUB': '社会主義（共産主義）',
-            'VEN': 'ポピュリズム', 'TUR': '権威主義', 'KOR': '自由主義', 'IDN': '多元主義',
-            'PAK': 'イスラム主義（共和制）', 'ISR': '保守主義', 'COL': '自由主義',
-            'PER': 'ポピュリズム', 'GRL': '自由主義', // グリーンランドのISOコードはGRL (デンマーク領)
-            'AUT': '社会民主主義', 'BEL': '社会民主主義', 'CHE': '自由主義', 'DNK': '社会民主主義',
-            'FIN': '社会民主主義', 'IRL': '自由主義', 'NLD': '自由主義', 'NZL': '自由主義',
-            'SGP': '権威主義', 'THA': '権威主義', 'PHL': '自由主義', 'MYS': '多元主義',
-            'CHL': '自由主義', 'CZE': '社会民主主義', 'POL': '保守主義', 'UKR': '多元主義',
+            'USA': { name_ja: 'アメリカ合衆国', ideology: '自由主義' },
+            'CAN': { name_ja: 'カナダ', ideology: '自由主義' },
+            'GBR': { name_ja: 'イギリス', ideology: '自由主義' },
+            'FRA': { name_ja: 'フランス', ideology: '社会民主主義' },
+            'DEU': { name_ja: 'ドイツ', ideology: '社会民主主義' },
+            'JPN': { name_ja: '日本', ideology: '保守主義' },
+            'CHN': { name_ja: '中華人民共和国', ideology: '社会主義（共産主義）' },
+            'RUS': { name_ja: 'ロシア連邦', ideology: '権威主義' },
+            'IND': { name_ja: 'インド', ideology: '多元主義' },
+            'BRA': { name_ja: 'ブラジル', ideology: '社会民主民主主義' },
+            'AUS': { name_ja: 'オーストラリア', ideology: '自由主義' },
+            'ZAF': { name_ja: '南アフリカ', ideology: '社会民主主義' },
+            'SAU': { name_ja: 'サウジアラビア', ideology: 'イスラム主義（君主制）' },
+            'IRN': { name_ja: 'イラン', ideology: 'イスラム主義（共和制）' },
+            'PRK': { name_ja: '朝鮮民主主義人民共和国', ideology: '全体主義' },
+            'SWE': { name_ja: 'スウェーデン', ideology: '社会民主主義' },
+            'NOR': { name_ja: 'ノルウェー', ideology: '社会民主主義' },
+            'ESP': { name_ja: 'スペイン', ideology: '社会民主主義' },
+            'ITA': { name_ja: 'イタリア', ideology: '社会民主主義' },
+            'MEX': { name_ja: 'メキシコ', ideology: '自由主義' },
+            'ARG': { name_ja: 'アルゼンチン', ideology: 'ポピュリズム' },
+            'EGY': { name_ja: 'エジプト', ideology: 'イスラム主義（軍政）' },
+            'NGA': { name_ja: 'ナイジェリア', ideology: '多元主義' },
+            'VNM': { name_ja: 'ベトナム', ideology: '社会主義（共産主義）' },
+            'CUB': { name_ja: 'キューバ', ideology: '社会主義（共産主義）' },
+            'VEN': { name_ja: 'ベネズエラ', ideology: 'ポピュリズム' },
+            'TUR': { name_ja: 'トルコ', ideology: '権威主義' },
+            'KOR': { name_ja: '韓国', ideology: '自由主義' },
+            'IDN': { name_ja: 'インドネシア', ideology: '多元主義' },
+            'PAK': { name_ja: 'パキスタン', ideology: 'イスラム主義（共和制）' },
+            'ISR': { name_ja: 'イスラエル', ideology: '保守主義' },
+            'COL': { name_ja: 'コロンビア', ideology: '自由主義' },
+            'PER': { name_ja: 'ペルー', ideology: 'ポピュリズム' },
+            'GRL': { name_ja: 'グリーンランド', ideology: '自由主義' }, // グリーンランドのISOコードはGRL (デンマーク領)
+            'AUT': { name_ja: 'オーストリア', ideology: '社会民主主義' },
+            'BEL': { name_ja: 'ベルギー', ideology: '社会民主主義' },
+            'CHE': { name_ja: 'スイス', ideology: '自由主義' },
+            'DNK': { name_ja: 'デンマーク', ideology: '社会民主主義' },
+            'FIN': { name_ja: 'フィンランド', ideology: '社会民主主義' },
+            'IRL': { name_ja: 'アイルランド', ideology: '自由主義' },
+            'NLD': { name_ja: 'オランダ', ideology: '自由主義' },
+            'NZL': { name_ja: 'ニュージーランド', ideology: '自由主義' },
+            'SGP': { name_ja: 'シンガポール', ideology: '権威主義' },
+            'THA': { name_ja: 'タイ', ideology: '権威主義' },
+            'PHL': { name_ja: 'フィリピン', ideology: '自由主義' },
+            'MYS': { name_ja: 'マレーシア', ideology: '多元主義' },
+            'CHL': { name_ja: 'チリ', ideology: '自由主義' },
+            'CZE': { name_ja: 'チェコ', ideology: '社会民主主義' },
+            'POL': { name_ja: 'ポーランド', ideology: '保守主義' },
+            'UKR': { name_ja: 'ウクライナ', ideology: '多元主義' },
             // 世界の多くの国は「未分類」になります。必要に応じてさらに国とイデオロギーを追加してください。
         };
 
@@ -157,6 +192,7 @@
                         // countries.geojson ファイルが `index.html` と同じディレクトリにあることを確認してください。
                         data: './countries.geojson'
                     }
+                    // 'country-centroids' ソースは、Map.on('load') イベント内で動的に追加されます
                 },
                 layers: [
                     // 衛星画像レイヤー
@@ -179,7 +215,7 @@
                             'fill-color': [
                                 'match',
                                 ['get', 'iso_a3'], // GeoJSON内のISO 3文字コードのプロパティ名
-                                ...Object.entries(ideologyData).flatMap(([iso_a3, ideology]) => [iso_a3, ideologyColors[ideology] || ideologyColors['未分類']]),
+                                ...Object.entries(ideologyData).flatMap(([iso_a3, data]) => [iso_a3, ideologyColors[data.ideology] || ideologyColors['未分類']]),
                                 ideologyColors['未分類'] // 一致しない場合のデフォルト色 (未分類)
                             ],
                             'fill-opacity': 0.7 // ポリゴンの透明度
@@ -195,6 +231,7 @@
                             'line-width': 0.5 // 国境線の太さ
                         }
                     }
+                    // 'country-circles' レイヤーは、Map.on('load') イベント内で動的に追加されます
                 ]
             },
             center: [0, 20], // マップの初期中心座標 (経度, 緯度)
@@ -209,9 +246,10 @@
         const legendContent = document.getElementById('legend-content');
 
         let allCountriesGeoJSON = null; // 全国のGeoJSONデータを保持する変数
+        let countryCentroidsGeoJSON = { type: 'FeatureCollection', features: [] }; // 各国の重心点を保持するGeoJSON
 
         // --- Turf.js の読み込みとマップイベントリスナー登録 ---
-        // Turf.js は地理空間演算 (例: バウンディングボックスの計算) のためのJavaScriptライブラリです。
+        // Turf.js は地理空間演算 (例: バウンディングボックスの計算、重心の計算) のためのJavaScriptライブラリです。
         const turfScript = document.createElement('script');
         turfScript.src = 'https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js';
         document.head.appendChild(turfScript);
@@ -221,30 +259,123 @@
         turfScript.onload = () => {
             // マップが完全にロードされたときに実行されるイベントリスナー
             map.on('load', () => {
-                // --- 国をクリックした時のポップアップ表示 ---
-                map.on('click', 'country-fills', (e) => {
-                    const countryProperties = e.features[0].properties;
-                    // GeoJSONのプロパティ名に合わせてISO 3文字コードと国名を取得します。
-                    // 複数の候補を試すことで、GeoJSONの多様性に対応します。
-                    const iso_a3 = countryProperties.iso_a3 || countryProperties.properties_iso_a3 || countryProperties.ADM0_A3;
-                    const countryName = countryProperties.name || countryProperties.NAME || countryProperties.FORMAL_EN || '不明な国';
+                // --- GeoJSONファイルの読み込みと処理 ---
+                fetch('./countries.geojson')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status} - Could not load countries.geojson. Make sure it's in the same directory.`);
+                        }
+                        return response.json();
+                    })
+                    .then(geojson => {
+                        allCountriesGeoJSON = geojson; // 読み込んだGeoJSONデータを保存
+                        countryCentroidsGeoJSON.features = []; // 重心点データを初期化
 
-                    const ideology = ideologyData[iso_a3] || '不明'; // 定義されたイデオロギー、または「不明」
+                        // 各国の重心点を計算し、ドロップダウンリストを生成
+                        const countriesForSelect = [];
+                        allCountriesGeoJSON.features.forEach(feature => {
+                            // GeoJSONのプロパティ名に合わせてISO 3文字コードを取得
+                            const iso_a3 = feature.properties.iso_a3 || feature.properties.properties_iso_a3 || feature.properties.ADM0_A3;
+                            
+                            let countryNameForDisplay = '不明な国';
+                            if (ideologyData[iso_a3] && ideologyData[iso_a3].name_ja) {
+                                countryNameForDisplay = ideologyData[iso_a3].name_ja;
+                            } else {
+                                // ideologyDataにない場合、GeoJSONのプロパティから英語名などを試みる
+                                countryNameForDisplay = feature.properties.name || feature.properties.NAME || feature.properties.FORMAL_EN || '不明な国';
+                            }
 
-                    // ポップアップを表示
-                    new maplibregl.Popup()
-                        .setLngLat(e.lngLat) // クリックされた場所
-                        .setHTML(`<strong>${countryName}</strong><br>イデオロギー: ${ideology}`) // 表示内容
-                        .addTo(map);
-                });
 
-                // --- ホバー時のカーソル変更 (クリック可能であることを示す) ---
-                map.on('mouseenter', 'country-fills', () => {
-                    map.getCanvas().style.cursor = 'pointer';
-                });
-                map.on('mouseleave', 'country-fills', () => {
-                    map.getCanvas().style.cursor = '';
-                });
+                            if (iso_a3 && feature.geometry) {
+                                countriesForSelect.push({
+                                    name_ja: countryNameForDisplay,
+                                    iso_a3: iso_a3,
+                                    geometry: feature.geometry
+                                });
+
+                                // 各国の重心を計算し、Pointフィーチャーとして追加
+                                try {
+                                    const centroid = turf.centroid(feature.geometry);
+                                    centroid.properties = {
+                                        iso_a3: iso_a3,
+                                        name_ja: countryNameForDisplay
+                                    };
+                                    countryCentroidsGeoJSON.features.push(centroid);
+                                } catch (e) {
+                                    console.warn(`Could not calculate centroid for ${countryNameForDisplay} (${iso_a3}):`, e);
+                                }
+                            }
+                        });
+
+                        // 重心点GeoJSONソースをマップに追加
+                        map.addSource('country-centroids', {
+                            type: 'geojson',
+                            data: countryCentroidsGeoJSON
+                        });
+
+                        // 重心点を示すCircleレイヤーを追加
+                        map.addLayer({
+                            id: 'country-circles',
+                            type: 'circle',
+                            source: 'country-centroids',
+                            paint: {
+                                'circle-color': '#000000', // 円の色 (黒)
+                                'circle-radius': [ // ズームレベルに応じて円のサイズを変更
+                                    'interpolate', ['linear'], ['zoom'],
+                                    1, 1, // ズームレベル1で半径1px
+                                    5, 4, // ズームレベル5で半径4px
+                                    10, 8 // ズームレベル10で半径8px
+                                ],
+                                'circle-stroke-color': '#FFFFFF', // 円の枠線の色 (白)
+                                'circle-stroke-width': 1, // 円の枠線の太さ
+                                'circle-opacity': 0.8 // 円の透明度
+                            }
+                        });
+
+                        // --- 国選択ドロップダウンの初期化 ---
+                        countriesForSelect.sort((a, b) => a.name_ja.localeCompare(b.name_ja, 'ja')); // 日本語でソート
+                        countriesForSelect.forEach(country => {
+                            const option = document.createElement('option');
+                            option.value = country.iso_a3;
+                            option.textContent = country.name_ja; // 日本語名を表示
+                            countrySelect.appendChild(option);
+                        });
+
+                        // --- 国をクリックした時のポップアップ表示 (ポリゴンと円の両方に対応) ---
+                        map.on('click', ['country-fills', 'country-circles'], (e) => {
+                            const countryProperties = e.features[0].properties;
+                            const iso_a3 = countryProperties.iso_a3 || countryProperties.properties_iso_a3 || countryProperties.ADM0_A3;
+                            
+                            let countryNameDisplay = '不明な国';
+                            let ideologyDisplay = '不明';
+
+                            if (ideologyData[iso_a3]) {
+                                countryNameDisplay = ideologyData[iso_a3].name_ja || countryProperties.name || countryProperties.NAME || '不明な国';
+                                ideologyDisplay = ideologyData[iso_a3].ideology || '不明';
+                            } else {
+                                // ideologyDataにない場合、GeoJSONのプロパティから英語名などを試みる
+                                countryNameDisplay = countryProperties.name || countryProperties.NAME || countryProperties.FORMAL_EN || '不明な国';
+                            }
+
+                            new maplibregl.Popup()
+                                .setLngLat(e.lngLat)
+                                .setHTML(`<strong>${countryNameDisplay}</strong><br>イデオロギー: ${ideologyDisplay}`)
+                                .addTo(map);
+                        });
+
+                        // ホバー時のカーソル変更 (ポリゴンと円の両方に対応)
+                        map.on('mouseenter', ['country-fills', 'country-circles'], () => {
+                            map.getCanvas().style.cursor = 'pointer';
+                        });
+                        map.on('mouseleave', ['country-fills', 'country-circles'], () => {
+                            map.getCanvas().style.cursor = '';
+                        });
+
+                    }) // fetch .then(geojson => ...) の終わり
+                    .catch(error => {
+                        console.error('Error fetching countries.geojson:', error);
+                        alert('国境線データの読み込みに失敗しました。ファイルが正しい場所にあるか、開発者ツールでエラーを確認してください。');
+                    });
 
                 // --- 凡例を生成して表示 ---
                 for (const [ideology, color] of Object.entries(ideologyColors)) {
@@ -258,8 +389,7 @@
                 }
 
                 // --- イデオロギー選択ドロップダウンの初期化 ---
-                // ideologyDataからユニークなイデオロギーのリストを作成
-                const uniqueIdeologies = new Set(Object.values(ideologyData));
+                const uniqueIdeologies = new Set(Object.values(ideologyData).map(data => data.ideology));
                 uniqueIdeologies.forEach(ideology => {
                     const option = document.createElement('option');
                     option.value = ideology;
@@ -270,14 +400,14 @@
                 // 「適用 & 移動」ボタンのクリックイベントリスナー
                 applyIdeologyFilterButton.addEventListener('click', () => {
                     const selectedIdeology = ideologySelect.value;
-                    let targetFeatures = []; // 選択されたイデオロギーに属する国のGeoJSONフィーチャーを格納する配列
+                    let targetFeatures = [];
 
                     if (selectedIdeology === 'all') {
                         // 「全ての国を表示」が選択された場合、色分けをリセット
                         map.setPaintProperty('country-fills', 'fill-color', [
                             'match',
                             ['get', 'iso_a3'], // GeoJSONプロパティ名に合わせる
-                            ...Object.entries(ideologyData).flatMap(([iso_a3, ideology]) => [iso_a3, ideologyColors[ideology] || ideologyColors['未分類']]),
+                            ...Object.entries(ideologyData).flatMap(([iso_a3, data]) => [iso_a3, ideologyColors[data.ideology] || ideologyColors['未分類']]),
                             ideologyColors['未分類']
                         ]);
                         map.setPaintProperty('country-fills', 'fill-opacity', 0.7);
@@ -288,12 +418,12 @@
                         map.setPaintProperty('country-fills', 'fill-color', [
                             'match',
                             ['get', 'iso_a3'], // GeoJSONプロパティ名に合わせる
-                            ...Object.entries(ideologyData).map(([iso_a3, ideology]) => {
-                                if (ideology === selectedIdeology) {
+                            ...Object.entries(ideologyData).map(([iso_a3, data]) => {
+                                if (data.ideology === selectedIdeology) {
                                     // 該当する国のフィーチャーを見つけてリストに追加
                                     const feature = allCountriesGeoJSON.features.find(f => (f.properties.iso_a3 || f.properties.properties_iso_a3 || f.properties.ADM0_A3) === iso_a3);
                                     if (feature) targetFeatures.push(feature);
-                                    return [iso_a3, ideologyColors[ideology]]; // 該当イデオロギーの色
+                                    return [iso_a3, ideologyColors[data.ideology]]; // 該当イデオロギーの色
                                 } else {
                                     return [iso_a3, '#D3D3D3']; // 他のイデオロギーは薄いグレー
                                 }
@@ -303,8 +433,8 @@
                         map.setPaintProperty('country-fills', 'fill-opacity', [
                             'match',
                             ['get', 'iso_a3'], // GeoJSONプロパティ名に合わせる
-                            ...Object.entries(ideologyData).map(([iso_a3, ideology]) => {
-                                if (ideology === selectedIdeology) {
+                            ...Object.entries(ideologyData).map(([iso_a3, data]) => {
+                                if (data.ideology === selectedIdeology) {
                                     return [iso_a3, 0.7]; // 濃く表示
                                 } else {
                                     return [iso_a3, 0.2]; // 薄く表示
@@ -329,71 +459,31 @@
                     }
                 });
 
-                // --- 国選択ドロップダウンの初期化と移動機能 ---
-                // countries.geojson ファイルを非同期で読み込む
-                fetch('./countries.geojson')
-                    .then(response => {
-                        // HTTPエラーが発生した場合のチェック
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status} - Could not load countries.geojson. Make sure it's in the same directory.`);
-                        }
-                        return response.json();
-                    })
-                    .then(geojson => {
-                        allCountriesGeoJSON = geojson; // 読み込んだGeoJSONデータを保存
+                // 「移動」ボタンのクリックイベントリスナー
+                goToCountryButton.addEventListener('click', () => {
+                    const selectedIso_a3 = countrySelect.value;
+                    if (selectedIso_a3 === '' || selectedIso_a3 === '---') {
+                        alert('国を選択してください。');
+                        return;
+                    }
 
-                        // 全国の国名をソートしてドロップダウンに追加
-                        const countries = allCountriesGeoJSON.features
-                            .map(feature => ({
-                                // GeoJSONのプロパティ名に合わせて国名とISO 3文字コードを取得
-                                // ここは、お使いの countries.geojson のプロパティ名に合わせて調整してください。
-                                // 例: Natural Earth のデータでは 'name' と 'iso_a3' が一般的です。
-                                name: feature.properties.name || feature.properties.NAME || feature.properties.FORMAL_EN || '不明な国',
-                                iso_a3: feature.properties.iso_a3 || feature.properties.properties_iso_a3 || feature.properties.ADM0_A3 || '---',
-                                geometry: feature.geometry // 地理情報も取得
-                            }))
-                            // ISOコードがない、またはgeometryがない国はドロップダウンから除外
-                            .filter(country => country.iso_a3 !== '---' && country.geometry)
-                            .sort((a, b) => a.name.localeCompare(b.name, 'ja')); // 日本語でソート
+                    // 選択されたISOコードに対応するGeoJSONフィーチャーを検索
+                    const selectedFeature = allCountriesGeoJSON.features.find(feature =>
+                        (feature.properties.iso_a3 || feature.properties.properties_iso_a3 || feature.properties.ADM0_A3) === selectedIso_a3
+                    );
 
-                        countries.forEach(country => {
-                            const option = document.createElement('option');
-                            option.value = country.iso_a3; // オプションの値はISOコード
-                            option.textContent = country.name; // オプションの表示テキストは国名
-                            countrySelect.appendChild(option);
+                    // 選択された国の地理情報が見つかった場合、その国にマップを移動・ズーム
+                    if (selectedFeature && selectedFeature.geometry) {
+                        const bbox = turf.bbox(selectedFeature.geometry); // 国のバウンディングボックスを計算
+                        map.fitBounds(bbox, {
+                            padding: 50, // マップの端からの余白
+                            duration: 1500, // アニメーションの時間（ミリ秒）
+                            maxZoom: 7 // 個別の国にズームする際の最大ズームレベル
                         });
-
-                        // 「移動」ボタンのクリックイベントリスナー
-                        goToCountryButton.addEventListener('click', () => {
-                            const selectedIso_a3 = countrySelect.value;
-                            if (selectedIso_a3 === '' || selectedIso_a3 === '---') {
-                                alert('国を選択してください。');
-                                return;
-                            }
-
-                            // 選択されたISOコードに対応するGeoJSONフィーチャーを検索
-                            const selectedFeature = allCountriesGeoJSON.features.find(feature =>
-                                (feature.properties.iso_a3 || feature.properties.properties_iso_a3 || feature.properties.ADM0_A3) === selectedIso_a3
-                            );
-
-                            // 選択された国の地理情報が見つかった場合、その国にマップを移動・ズーム
-                            if (selectedFeature && selectedFeature.geometry) {
-                                const bbox = turf.bbox(selectedFeature.geometry); // 国のバウンディングボックスを計算
-                                map.fitBounds(bbox, {
-                                    padding: 50, // マップの端からの余白
-                                    duration: 1500, // アニメーションの時間（ミリ秒）
-                                    maxZoom: 7 // 個別の国にズームする際の最大ズームレベル
-                                });
-                            } else {
-                                alert('選択された国の地理情報が見つかりませんでした。');
-                            }
-                        });
-                    })
-                    .catch(error => {
-                        // GeoJSONファイルの読み込みエラーが発生した場合
-                        console.error('Error fetching countries.geojson:', error);
-                        alert('国境線データの読み込みに失敗しました。ファイルが正しい場所にあるか、開発者ツールでエラーを確認してください。');
-                    });
+                    } else {
+                        alert('選択された国の地理情報が見つかりませんでした。');
+                    }
+                });
             }); // map.on('load') の終わり
         }; // turfScript.onload の終わり
     </script>
