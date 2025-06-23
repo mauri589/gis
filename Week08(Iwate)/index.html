@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Iwate 1km Mesh Total Number of Farmers Map</title>
+		<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+		<link
+			href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css"
+			rel="stylesheet"
+		/>
+		<style>
+			body {
+				margin: 0;
+				padding: 0;
+			}
+			#map {
+				width: 100%;
+				height: 100vh;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="map"></div>
+		<script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+		<script>
+			const map = new maplibregl.Map({
+				container: 'map',
+				style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+				center: [141.15, 39.70],
+				zoom: 9
+			});
+
+			map.on('load', () => {
+				map.addSource('iwate', {
+					type: 'geojson',
+					data: 'iwate_T001079001.geojson'
+				});
+
+				map.addLayer({
+					id: 'population-layer',
+					type: 'fill',
+					source: 'iwate',
+					paint: {
+						'fill-color': [
+							'interpolate',
+							['linear'],
+							['get', 'T001079001'],
+							0,
+							'#ECDOEC',
+							5000,
+							'#BA71A2',
+							10000,
+							'#7E2A53',
+							15000,
+							'#502A50',
+							20000,
+							'#461D3A'
+						],
+						'fill-opacity': 0.75,
+						'fill-outline-color': '#ffffff'
+					}
+				});
+			});
+		</script>
+	</body>
+</html>

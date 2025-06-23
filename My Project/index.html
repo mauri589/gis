@@ -47,6 +47,24 @@
             </select>
             <button id="go-to-country">移動</button>
         </div>
+        <div class="control-group">
+            <label for="ideology-select">イデオロギーで絞り込み:</label>
+            <select id="ideology-select">
+                <option value="">すべて表示</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="layer-select">レイヤー表示:</label>
+            <select id="layer-select">
+                <option value="all">すべての国</option>
+                <option value="liberal">自由主義</option>
+                <option value="socialdem">社会民主主義</option>
+                <option value="conservative">保守主義</option>
+                <option value="socialist">社会主義（共産主義）</option>
+                <option value="authoritarian">権威主義</option>
+                <option value="other">未分類</option>
+            </select>
+        </div>
     </div>
     <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
@@ -78,7 +96,7 @@
             sources: {
                 'countries': {
                     type: 'geojson',
-                    data: './countries.geojson'
+                    data: './ideology2024.geojson'
                 }
             },
             layers: [
@@ -114,18 +132,19 @@
     const countrySelect = document.getElementById('country-select');
     const goToCountryButton = document.getElementById('go-to-country');
     const legendContent = document.getElementById('legend-content');
+    const ideologySelect = document.getElementById('ideology-select');
+    const layerSelect = document.getElementById('layer-select');
     let allCountriesGeoJSON = null;
 
     // --- GeoJSONロードとドロップダウン初期化 ---
     map.on('load', () => {
-        fetch('./countries.geojson')
+        fetch('./ideology2024.geojson')
             .then(res => res.json())
             .then(geojson => {
                 allCountriesGeoJSON = geojson;
                 // ドロップダウン初期化
                 const countriesForSelect = [];
                 geojson.features.forEach(feature => {
-                   
                     const iso_a3 = feature.properties.iso_a3 || feature.properties.properties_iso_a3 || feature.properties.ADM0_A3;
                     let countryNameForDisplay = '不明な国';
                     if (iso_a3 && ideologyData[iso_a3] && ideologyData[iso_a3].name_ja) {
@@ -144,9 +163,19 @@
                     option.textContent = country.name_ja;
                     countrySelect.appendChild(option);
                 });
+                // --- ここでマップのソースデータを更新 ---
+                if (map.getSource('countries')) {
+                    map.getSource('countries').setData(geojson);
+                }
+                // --- 国境レイヤーを白塗り＋黒点線でオーバーレイする ---
+                overlayCountries();
+                console.log('国データが正常に読み込まれました。');
+                console.log(`国数: ${countriesForSelect.length}`);
+                console.log(`イデオロギー定義数: ${Object.keys(ideologyData).length}`);
+                console.log(`イデオロギー色定義数: ${Object.keys(ideologyColors).length}`);
+                console.log(geojson)
             })
             .catch(error => {
-                alert('国境線データの読み込みに失敗しました。');
                 console.error(error);
             });
 
@@ -159,6 +188,45 @@
                 legendContent.appendChild(item);
             }
         }
+
+        // --- イデオロギー選択肢を初期化 ---
+        Object.keys(ideologyColors).forEach(ideology => {
+            if (ideology === '未分類') return;
+            const option = document.createElement('option');
+            option.value = ideology;
+            option.textContent = ideology;
+            ideologySelect.appendChild(option);
+        });
+
+        // --- レイヤー選択肢 ---
+        const ideologyLayerMap = {
+            liberal: '自由主義',
+            socialdem: '社会民主主義',
+            conservative: '保守主義',
+            socialist: '社会主義（共産主義）',
+            authoritarian: '権威主義',
+            other: '未分類'
+        };
+
+        layerSelect.addEventListener('change', () => {
+            const value = layerSelect.value;
+            if (!map.getLayer('country-fills')) return;
+            if (value === 'all') {
+                map.setFilter('country-fills', null);
+            } else if (value === 'other') {
+                // 未分類
+                const isoList = Object.entries(ideologyData)
+                    .filter(([iso, data]) => !(Object.values(ideologyLayerMap).includes(data.ideology)))
+                    .map(([iso]) => iso);
+                map.setFilter('country-fills', ['in', ['get', 'iso_a3'], ['literal', isoList]]);
+            } else {
+                const ideology = ideologyLayerMap[value];
+                const isoList = Object.entries(ideologyData)
+                    .filter(([iso, data]) => data.ideology === ideology)
+                    .map(([iso]) => iso);
+                map.setFilter('country-fills', ['in', ['get', 'iso_a3'], ['literal', isoList]]);
+            }
+        });
     });
 
     // --- 「移動」ボタンのイベントリスナー（重複禁止！） ---
@@ -197,6 +265,42 @@
             alert('選択された国の地理情報が見つかりませんでした。');
         }
     });
+
+    // --- イデオロギーで国を絞り込む ---
+    ideologySelect.addEventListener('change', () => {
+        const selectedIdeology = ideologySelect.value;
+        if (!map.getLayer('country-fills')) return;
+        if (!selectedIdeology) {
+            // すべて表示
+            map.setFilter('country-fills', null);
+        } else {
+            // 選択イデオロギーの国のみ表示
+            const isoList = Object.entries(ideologyData)
+                .filter(([iso, data]) => data.ideology === selectedIdeology)
+                .map(([iso]) => iso);
+            map.setFilter('country-fills', ['in', ['get', 'iso_a3'], ['literal', isoList]]);
+        }
+    });
+
+    // --- 国境レイヤーを白塗りでオーバーレイする関数 ---
+    function overlayCountries() {
+        // 既存レイヤーがあれば削除
+        if (map.getLayer('country-overlay-fill')) {
+            map.removeLayer('country-overlay-fill');
+        }
+        // 既存ソースがなければ追加
+        if (!map.getSource('countries')) return;
+        // 白塗りレイヤー
+        map.addLayer({
+            id: 'country-overlay-fill',
+            type: 'fill',
+            source: 'countries',
+            paint: {
+                'fill-color': 'red',
+                'fill-opacity': 0.5
+            }
+        });
+    }
     </script>
 </body>
 </html>
