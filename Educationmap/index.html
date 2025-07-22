@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<title>MapLibre Basemap Starter</title>
+	<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+	<link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+
+		#map {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			width: 100%;
+		}
+		/* ...existing code... */
+	</style>
+</head>
+<body>
+	<!-- タイトルバー -->
+	<div id="mainTitle" style="
+		position:fixed;
+		top:0;
+		left:0;
+		width:100vw;
+		z-index:10001;
+		margin:0;
+		padding:0;
+		background:#ff94b2;
+		color:#d72660;
+		text-align:center;
+		font-size:2.1rem;
+		font-weight:900;
+		box-shadow:0 2px 12px rgba(0,0,0,0.08);
+		display:none;
+		align-items:center;
+		justify-content:center;
+		height:90px;
+		pointer-events:none;
+	">
+		<span id="mainTitleEn" style="font-size:2.1rem;font-weight:900;line-height:1.15;">
+			Awakening the Citizen: Mapping Education's Role in Shaping Japan's Future
+		</span>
+		<span id="mainTitleJa" style="font-size:2.1rem;font-weight:900;line-height:1.15;display:none;">
+			市民の目覚め：教育が描く日本の未来地図
+		</span>
+	</div>
+	<!-- サイドタブバー（左側に縦配置、開閉可能） -->
+	<div id="mainTabs" style="
+		position:fixed;
+		top:90px;
+		left:0;
+		width:110px;
+		height:calc(100vh - 90px);
+		z-index:10001;
+		background:#fff;
+		border-right:2px solid #ff94b2;
+		display:none;
+		flex-direction:column;
+		align-items:flex-start;
+		justify-content:flex-start;
+		gap:8px;
+		box-shadow:2px 0 8px rgba(0,0,0,0.04);
+		pointer-events:auto;
+		padding-top:0;
+		transition:width 0.2s;
+		overflow:visible;
+	">
+		<!-- 開閉トグルボタン（大きくして右端に） -->
+		<button id="tabToggleBtn" style="
+			position:absolute;
+			top:18px;
+			left:90px;
+			width:44px;
+			height:44px;
+			border-radius:50%;
+			border:2.5px solid #ff94b2;
+			background:#fff;
+			color:#d72660;
+			font-size:2rem;
+			font-weight:bold;
+			box-shadow:0 2px 8px rgba(0,0,0,0.08);
+			cursor:pointer;
+			z-index:10002;
+			display:flex;
+			align-items:center;
+			justify-content:center;
+			transition:transform 0.2s;
+		">≡</button>
+		<div id="tabBtnGroup" style="display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%;margin-top:56px;">
+			<button class="tabBtn" data-tab="map" style="background:none;border:none;color:#d72660;font-size:1.05rem;font-weight:700;padding:14px 0;cursor:pointer;transition:color 0.2s;width:100%;">
+				<span class="tabLabelEn">Map</span><span class="tabLabelJa" style="display:none;">マップ</span>
+			</button>
+			<button class="tabBtn" data-tab="blog" style="background:none;border:none;color:#888;font-size:1.05rem;font-weight:700;padding:14px 0;cursor:pointer;transition:color 0.2s;width:100%;">
+				<span class="tabLabelEn">Background</span><span class="tabLabelJa" style="display:none;">背景</span>
+			</button>
+			<button class="tabBtn" data-tab="datas" style="background:none;border:none;color:#888;font-size:1.05rem;font-weight:700;padding:14px 0;cursor:pointer;transition:color 0.2s;width:100%;">
+				<span class="tabLabelEn">Datas</span><span class="tabLabelJa" style="display:none;">データ</span>
+			</button>
+			<button class="tabBtn" data-tab="desc" style="background:none;border:none;color:#888;font-size:1.05rem;font-weight:700;padding:14px 0;cursor:pointer;transition:color 0.2s;width:100%;">
+				<span class="tabLabelEn">Tools</span><span class="tabLabelJa" style="display:none;">ツール</span>
+			</button>
+			<button class="tabBtn" data-tab="widget" style="background:none;border:none;color:#888;font-size:1.05rem;font-weight:700;padding:14px 0;cursor:pointer;transition:color 0.2s;width:100%;">
+				<span class="tabLabelEn">Sources</span><span class="tabLabelJa" style="display:none;">出典</span>
+			</button>
+		</div>
+		<!-- サイド下部に操作ボタン -->
+		<div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:auto;margin-bottom:24px;width:100%;">
+			<button id="lightBtn" style="font-size:0.95rem;padding:0.5em 0.7em;border-radius:18px;border:none;background:#f7f7f7;color:#d72660;box-shadow:0 1px 6px rgba(0,0,0,0.10);cursor:pointer;font-weight:900;letter-spacing:0.01em;transition:background 0.2s,transform 0.1s;border:1px solid #bbb;font-family: inherit;width:80%;">Light</button>
+			<button id="darkBtn" style="font-size:0.95rem;padding:0.5em 0.7em;border-radius:18px;border:none;background:#f7f7f7;color:#d72660;box-shadow:0 1px 6px rgba(0,0,0,0.10);cursor:pointer;font-weight:900;letter-spacing:0.01em;transition:background 0.2s,transform 0.1s;border:1px solid #bbb;font-family: inherit;width:80%;">Dark</button>
+			<button id="langBtn" style="font-size:0.95rem;padding:0.5em 0.7em;border-radius:18px;border:none;background:#fff;color:#d72660;box-shadow:0 1px 6px rgba(0,0,0,0.10);cursor:pointer;font-weight:900;letter-spacing:0.01em;transition:background 0.2s,transform 0.1s;border:1px solid #bbb;font-family: inherit;width:80%;">Eng/Jp</button>
+		</div>
+	</div>
+	<!-- 各タブのコンテンツ（右側のブロック表示） -->
+	<div id="tabContents" style="position:fixed;top:90px;right:0;width:100vw;height:calc(100vh - 90px);z-index:10000;pointer-events:none;">
+		<div id="tabContent-blog" style="display:none;position:absolute;top:8vh;right:3vw;width:520px;max-width:90vw;pointer-events:auto;
+	background:#fff;padding:56px 64px 56px 64px;border-radius:44px;box-shadow:0 12px 40px rgba(0,0,0,0.18);
+	color:#d72660;border-left:12px solid #ff94b2;border-top:8px solid #ff94b2;text-align:left;
+	font-size:2.1rem;font-weight:900;text-shadow:2px 4px 16px rgba(255,148,178,0.13),0 2px 8px #fff;">
+		<span class="tabLabelEn" style="display:inline;">Background</span><span class="tabLabelJa" style="display:none;">背景</span>
+		<div class="blogContentJa" style="font-size:1.15rem;font-weight:400;color:#444;margin-top:24px;display:none;">
+			先日参加した日米韓リーダーズサミットでの経験は、私に大きな衝撃を与えました。海外の参加者たちとの議論を通じて、日本の現状、特に政治や社会情勢に対する国民の意識において、見過ごせない教育格差が潜んでいることを肌で感じたのです。このままではいけない、という強い危機感を抱きました。
+			海外で生活する人々や、国際的な視点を持つ人々の、自国や世界の情勢に対する深い洞察力、そしてそれに基づいた自律的な思考には、目を見張るものがありました。一方で、日本では、市民一人ひとりが社会の形成に主体的に関わるという意識が、残念ながらまだ十分ではないと感じています。政府や既存のシステムだけに頼るのではなく、私たち個人レベルで、教育を通じて社会に貢献できることはないか。この問いが、このマップ作成の原点です。
+		</div>
+		<div class="blogContentEn" style="font-size:1.15rem;font-weight:400;color:#444;margin-top:24px;display:none;">
+			My experience at the recent Japan-US-Korea Leaders Summit was a profound shock to me. Through discussions with participants from abroad, I keenly felt that there are overlooked educational disparities in Japan, especially in terms of public awareness of politics and social issues. I was struck by a strong sense of crisis that things cannot go on like this.
+			People living overseas and those with an international perspective have a remarkable ability to gain deep insights into their own countries and the world, and to think independently based on those insights. In contrast, I feel that in Japan, the awareness that each citizen should actively participate in shaping society is still not sufficient. Instead of relying solely on the government or existing systems, I began to ask myself: What can we do as individuals, through education, to contribute to society? This question is the starting point for creating this map.
+		</div>
+	</div>
+		<div id="tabContent-datas" style="display:none;position:absolute;top:8vh;right:3vw;width:520px;max-width:90vw;pointer-events:auto;
+			background:#fff;padding:56px 64px 56px 64px;border-radius:44px;box-shadow:0 12px 40px rgba(0,0,0,0.18);
+			color:#d72660;border-left:12px solid #ff94b2;border-top:8px solid #ff94b2;text-align:left;
+			font-size:2.1rem;font-weight:900;text-shadow:2px 4px 16px rgba(255,148,178,0.13),0 2px 8px #fff;">
+			<span class="tabLabelEn" style="display:inline;">Datas</span><span class="tabLabelJa" style="display:none;">データ</span>
+			<div style="font-size:1.15rem;font-weight:400;color:#444;margin-top:24px;">
+				<!-- Voter Turnout Database Table -->
+				<div style="overflow-x:auto;">
+					<table style="width:100%;border-collapse:collapse;font-size:1rem;">
+						<thead>
+							<tr style="background:#ffdbe8;">
+								<th style="padding:8px 6px;border-bottom:2px solid #ff94b2;">国</th>
+								<th style="padding:8px 6px;border-bottom:2px solid #ff94b2;">選挙年</th>
+								<th style="padding:8px 6px;border-bottom:2px solid #ff94b2;">投票率(%)</th>
+								<th style="padding:8px 6px;border-bottom:2px solid #ff94b2;">出典</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>日本</td>
+								<td>2021</td>
+								<td>55.93</td>
+								<td><a href="https://www.soumu.go.jp/senkyo/senkyo_s/data/shugiin2021/" target="_blank">総務省</a></td>
+							</tr>
+							<tr>
+								<td>アメリカ</td>
+								<td>2020</td>
+								<td>66.8</td>
+								<td><a href="https://www.census.gov/data/tables/time-series/demo/voting-and-registration/p20-585.html" target="_blank">US Census</a></td>
+							</tr>
+							<tr>
+								<td>韓国</td>
+								<td>2022</td>
+								<td>77.1</td>
+								<td><a href="https://www.nec.go.kr/site/eng/ex/bbs/View.do?cbIdx=1117&bcIdx=24413" target="_blank">NEC Korea</a></td>
+							</tr>
+							<tr>
+								<td>ドイツ</td>
+								<td>2021</td>
+								<td>76.6</td>
+								<td><a href="https://www.bundeswahlleiter.de/en/bundestagswahlen/2021/ergebnisse/bund-99.html" target="_blank">Bundeswahlleiter</a></td>
+							</tr>
+							<tr>
+								<td>イギリス</td>
+								<td>2019</td>
+								<td>67.3</td>
+								<td><a href="https://www.electoralcommission.org.uk/who-we-are-and-what-we-do/elections-and-referendums/past-elections-and-referendums/uk-general-elections/results-and-turnout-uk-general-elections" target="_blank">Electoral Commission</a></td>
+							</tr>
+							<!-- ...追加データはここに... -->
+						</tbody>
+					</table>
+				</div>
+				<div style="font-size:0.95rem;color:#888;margin-top:12px;">
+					主要国の直近の国政選挙における投票率データ（出典は各国の公式統計等）
+				</div>
+			</div>
+		</div>
+		<div id="tabContent-desc" style="display:none;position:absolute;top:8vh;right:3vw;width:520px;max-width:90vw;pointer-events:auto;
+			background:#fff;padding:56px 64px 56px 64px;border-radius:44px;box-shadow:0 12px 40px rgba(0,0,0,0.18);
+			color:#d72660;border-left:12px solid #ff94b2;border-top:8px solid #ff94b2;text-align:left;
+			font-size:2.1rem;font-weight:900;text-shadow:2px 4px 16px rgba(255,148,178,0.13),0 2px 8px #fff;">
+			<span class="tabLabelEn" style="display:inline;">Tools</span><span class="tabLabelJa" style="display:none;">ツール</span>
+			<div id="toolsList" style="margin-top:24px;display:flex;flex-direction:column;gap:18px;">
+				<!-- Tool Card: MOOC -->
+				<a href="https://www.mooc.org/" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+					<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+						<img src="https://www.mooc.org/themes/custom/moocorg/logo.svg" alt="MOOC" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+						<div>
+							<div style="font-size:1.15rem;font-weight:700;color:#d72660;">MOOC.org</div>
+							<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+								<span class="tabLabelEn">A global platform for online courses from top universities and organizations.</span>
+								<span class="tabLabelJa" style="display:none;">世界中の大学や機関によるオンライン講座を集めたグローバルなプラットフォーム。</span>
+							</div>
+						</div>
+					</div>
+				</a>
+				<!-- Tool Card: Coursera -->
+				<a href="https://www.coursera.org/" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+					<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+						<img src="https://d3njjcbhbojbot.cloudfront.net/web/images/favicons/apple-touch-icon-76x76.png" alt="Coursera" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+						<div>
+							<div style="font-size:1.15rem;font-weight:700;color:#d72660;">Coursera</div>
+							<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+								<span class="tabLabelEn">Online courses from top universities and companies worldwide.</span>
+								<span class="tabLabelJa" style="display:none;">世界中の大学や企業によるオンラインコース。</span>
+							</div>
+						</div>
+					</div>
+				</a>
+				<!-- Tool Card: Schoo -->
+				<a href="https://schoo.jp/" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+					<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+						<img src="https://schoo.jp/assets/images/common/favicon.ico" alt="Schoo" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+						<div>
+							<div style="font-size:1.15rem;font-weight:700;color:#d72660;">Schoo</div>
+							<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+								<span class="tabLabelEn">Japanese live and recorded online learning platform.</span>
+								<span class="tabLabelJa" style="display:none;">日本発のライブ・録画型オンライン学習プラットフォーム。</span>
+							</div>
+						</div>
+					</div>
+				</a>
+				<!-- Tool Card: Edx -->
+				<a href="https://www.edx.org/" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+					<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+						<img src="https://www.edx.org/favicon.ico" alt="edX" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+						<div>
+							<div style="font-size:1.15rem;font-weight:700;color:#d72660;">edX</div>
+							<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+								<span class="tabLabelEn">Free online courses from the world's best universities.</span>
+								<span class="tabLabelJa" style="display:none;">世界のトップ大学による無料オンラインコース。</span>
+							</div>
+						</div>
+					</div>
+				</a>
+				<!-- Tool Card: Udacity -->
+				<a href="https://www.udacity.com/" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+					<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+						<img src="https://www.udacity.com/favicon.ico" alt="Udacity" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+						<div>
+							<div style="font-size:1.15rem;font-weight:700;color:#d72660;">Udacity</div>
+							<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+								<span class="tabLabelEn">Online courses and nanodegrees in tech and business.</span>
+								<span class="tabLabelJa" style="display:none;">テクノロジーやビジネス分野のオンラインコース・ナノディグリー。</span>
+							</div>
+						</div>
+					</div>
+				</a>
+				<!-- Tool Card: Academic Earth -->
+				<a href="http://www.academicearth.org/" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+					<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+						<img src="https://www.academicearth.org/favicon.ico" alt="Academic Earth" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+						<div>
+							<div style="font-size:1.15rem;font-weight:700;color:#d72660;">Academic Earth</div>
+							<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+								<span class="tabLabelEn">Free video courses from leading universities.</span>
+								<span class="tabLabelJa" style="display:none;">有名大学による無料ビデオ講座。</span>
+							</div>
+						</div>
+					</div>
+				</a>
+				<!-- Tool Card: eduFire -->
+				<a href="http://edufire.com" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+					<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+						<img src="https://edufire.com/favicon.ico" alt="eduFire" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+						<div>
+							<div style="font-size:1.15rem;font-weight:700;color:#d72660;">eduFire</div>
+							<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+								<span class="tabLabelEn">Live video classes and tutoring online.</span>
+								<span class="tabLabelJa" style="display:none;">ライブビデオ授業・オンライン家庭教師。</span>
+							</div>
+						</div>
+					</div>
+				</a>
+				<!-- Tool Card: Knewton -->
+				<a href="http://www.knewton.com" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+					<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+						<img src="https://www.knewton.com/favicon.ico" alt="Knewton" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+						<div>
+							<div style="font-size:1.15rem;font-weight:700;color:#d72660;">Knewton</div>
+							<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+								<span class="tabLabelEn">Adaptive learning technology for personalized education.</span>
+								<span class="tabLabelJa" style="display:none;">個別最適化学習のためのアダプティブラーニング技術。</span>
+							</div>
+						</div>
+					</div>
+				</a>
+			</div>
+		</div>
+		<div id="tabContent-widget" style="display:none;position:absolute;top:8vh;right:3vw;width:520px;max-width:90vw;pointer-events:auto;
+			background:#fff;padding:56px 64px 56px 64px;border-radius:44px;box-shadow:0 12px 40px rgba(0,0,0,0.18);
+			color:#d72660;border-left:12px solid #ff94b2;border-top:8px solid #ff94b2;text-align:left;
+			font-size:2.1rem;font-weight:900;text-shadow:2px 4px 16px rgba(255,148,178,0.13),0 2px 8px #fff;">
+			<span class="tabLabelEn" style="display:inline;">Sources</span><span class="tabLabelJa" style="display:none;">出典</span>
+			<div style="font-size:1.15rem;font-weight:400;color:#444;margin-top:24px;">出典のコンテンツ</div>
+		</div>
+	</div>
+	<!-- 各タブの全画面ページ -->
+	<div id="fullTabPages" style="display:none;">
+		<div id="fullTab-blog" class="fullTabPage" style="display:none;position:fixed;top:90px;left:0;right:0;height:calc(100vh - 90px);background:#fff;z-index:20000;overflow:auto;">
+			<div style="max-width:900px;margin:48px auto;padding:48px 24px;">
+				<h1 style="color:#d72660;font-size:2.3rem;font-weight:900;margin-bottom:24px;">
+					<span class="tabLabelEn">Background</span><span class="tabLabelJa" style="display:none;">背景</span>
+				</h1>
+				<div class="blogContentJa" style="font-size:1.25rem;color:#444;display:none;">
+					先日参加した日米韓リーダーズサミットでの経験は、私に大きな衝撃を与えました。海外の参加者たちとの議論を通じて、日本の現状、特に政治や社会情勢に対する国民の意識において、見過ごせない教育格差が潜んでいることを肌で感じたのです。このままではいけない、という強い危機感を抱きました。<br><br>
+					海外で生活する人々や、国際的な視点を持つ人々の、自国や世界の情勢に対する深い洞察力、そしてそれに基づいた自律的な思考には、目を見張るものがありました。一方で、日本では、市民一人ひとりが社会の形成に主体的に関わるという意識が、残念ながらまだ十分ではないと感じています。政府や既存のシステムだけに頼るのではなく、私たち個人レベルで、教育を通じて社会に貢献できることはないか。この問いが、このマップ作成の原点です。
+				</div>
+				<div class="blogContentEn" style="font-size:1.25rem;color:#444;display:none;">
+					My experience at the recent Japan-US-Korea Leaders Summit was a profound shock to me. Through discussions with participants from abroad, I keenly felt that there are overlooked educational disparities in Japan, especially in terms of public awareness of politics and social issues. I was struck by a strong sense of crisis that things cannot go on like this.<br><br>
+					People living overseas and those with an international perspective have a remarkable ability to gain deep insights into their own countries and the world, and to think independently based on those insights. In contrast, I feel that in Japan, the awareness that each citizen should actively participate in shaping society is still not sufficient. Instead of relying solely on the government or existing systems, I began to ask myself: What can we do as individuals, through education, to contribute to society? This question is the starting point for creating this map.
+				</div>
+				<button class="closeFullTabBtn" onclick="hideFullTabPage()" style="margin-top:48px;font-size:1.1rem;padding:0.7em 1.5em;border-radius:18px;border:none;background:#ff94b2;color:#d72660;box-shadow:0 1px 6px rgba(0,0,0,0.10);cursor:pointer;font-weight:900;">
+					<span class="closeLabelEn">Close</span><span class="closeLabelJa" style="display:none;">閉じる</span>
+				</button>
+			</div>
+		</div>
+		<div id="fullTab-datas" class="fullTabPage" style="display:none;position:fixed;top:90px;left:0;right:0;height:calc(100vh - 90px);background:#fff;z-index:20000;overflow:auto;">
+			<div style="max-width:900px;margin:48px auto;padding:48px 24px;">
+				<h1 style="color:#d72660;font-size:2.3rem;font-weight:900;margin-bottom:24px;">
+					<span class="tabLabelEn">Datas</span><span class="tabLabelJa" style="display:none;">データ</span>
+				</h1>
+				<div style="font-size:1.25rem;color:#444;">
+					データのコンテンツ（全画面表示）
+				</div>
+				<button class="closeFullTabBtn" onclick="hideFullTabPage()" style="margin-top:48px;font-size:1.1rem;padding:0.7em 1.5em;border-radius:18px;border:none;background:#ff94b2;color:#d72660;box-shadow:0 1px 6px rgba(0,0,0,0.10);cursor:pointer;font-weight:900;">
+					<span class="closeLabelEn">Close</span><span class="closeLabelJa" style="display:none;">閉じる</span>
+				</button>
+			</div>
+		</div>
+		<div id="fullTab-desc" class="fullTabPage" style="display:none;position:fixed;top:90px;left:0;right:0;height:calc(100vh - 90px);background:#fff;z-index:20000;overflow:auto;">
+			<div style="max-width:900px;margin:48px auto;padding:48px 24px;">
+				<h1 style="color:#d72660;font-size:2.3rem;font-weight:900;margin-bottom:24px;">
+					<span class="tabLabelEn">Tools</span><span class="tabLabelJa" style="display:none;">ツール</span>
+				</h1>
+				<div id="toolsListFull" style="display:flex;flex-direction:column;gap:18px;">
+					<!-- Tool Card: MOOC -->
+					<a href="https://www.mooc.org/" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+						<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+							<img src="https://www.mooc.org/themes/custom/moocorg/logo.svg" alt="MOOC" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+							<div>
+								<div style="font-size:1.15rem;font-weight:700;color:#d72660;">MOOC.org</div>
+								<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+									<span class="tabLabelEn">A global platform for online courses from top universities and organizations.</span>
+									<span class="tabLabelJa" style="display:none;">世界中の大学や機関によるオンライン講座を集めたグローバルなプラットフォーム。</span>
+								</div>
+							</div>
+						</div>
+					</a>
+					<!-- Tool Card: Coursera -->
+					<a href="https://www.coursera.org/" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+						<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+							<img src="https://d3njjcbhbojbot.cloudfront.net/web/images/favicons/apple-touch-icon-76x76.png" alt="Coursera" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+							<div>
+								<div style="font-size:1.15rem;font-weight:700;color:#d72660;">Coursera</div>
+								<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+									<span class="tabLabelEn">Online courses from top universities and companies worldwide.</span>
+									<span class="tabLabelJa" style="display:none;">世界中の大学や企業によるオンラインコース。</span>
+								</div>
+							</div>
+						</div>
+					</a>
+					<!-- Tool Card: Schoo -->
+					<a href="https://schoo.jp/" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+						<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+							<img src="https://schoo.jp/assets/images/common/favicon.ico" alt="Schoo" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+						<div>
+							<div style="font-size:1.15rem;font-weight:700;color:#d72660;">Schoo</div>
+							<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+								<span class="tabLabelEn">Japanese live and recorded online learning platform.</span>
+								<span class="tabLabelJa" style="display:none;">日本発のライブ・録画型オンライン学習プラットフォーム。</span>
+							</div>
+						</div>
+					</div>
+				</a>
+				<!-- Tool Card: Edx -->
+				<a href="https://www.edx.org/" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+					<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+						<img src="https://www.edx.org/favicon.ico" alt="edX" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+						<div>
+							<div style="font-size:1.15rem;font-weight:700;color:#d72660;">edX</div>
+							<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+								<span class="tabLabelEn">Free online courses from the world's best universities.</span>
+								<span class="tabLabelJa" style="display:none;">世界のトップ大学による無料オンラインコース。</span>
+							</div>
+						</div>
+					</div>
+				</a>
+				<!-- Tool Card: Udacity -->
+				<a href="https://www.udacity.com/" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+					<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+						<img src="https://www.udacity.com/favicon.ico" alt="Udacity" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+						<div>
+							<div style="font-size:1.15rem;font-weight:700;color:#d72660;">Udacity</div>
+							<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+								<span class="tabLabelEn">Online courses and nanodegrees in tech and business.</span>
+								<span class="tabLabelJa" style="display:none;">テクノロジーやビジネス分野のオンラインコース・ナノディグリー。</span>
+							</div>
+						</div>
+					</div>
+				</a>
+				<!-- Tool Card: Academic Earth -->
+				<a href="http://www.academicearth.org/" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+					<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+						<img src="https://www.academicearth.org/favicon.ico" alt="Academic Earth" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+						<div>
+							<div style="font-size:1.15rem;font-weight:700;color:#d72660;">Academic Earth</div>
+							<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+								<span class="tabLabelEn">Free video courses from leading universities.</span>
+								<span class="tabLabelJa" style="display:none;">有名大学による無料ビデオ講座。</span>
+							</div>
+						</div>
+					</div>
+				</a>
+				<!-- Tool Card: eduFire -->
+				<a href="http://edufire.com" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+					<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+						<img src="https://edufire.com/favicon.ico" alt="eduFire" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+						<div>
+							<div style="font-size:1.15rem;font-weight:700;color:#d72660;">eduFire</div>
+							<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+								<span class="tabLabelEn">Live video classes and tutoring online.</span>
+								<span class="tabLabelJa" style="display:none;">ライブビデオ授業・オンライン家庭教師。</span>
+							</div>
+						</div>
+					</div>
+				</a>
+				<!-- Tool Card: Knewton -->
+				<a href="http://www.knewton.com" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;">
+					<div style="display:flex;align-items:center;gap:18px;background:#f7f7f7;border-radius:18px;padding:18px 20px 18px 18px;box-shadow:0 2px 8px rgba(255,148,178,0.10);transition:box-shadow 0.2s;">
+						<img src="https://www.knewton.com/favicon.ico" alt="Knewton" style="width:56px;height:56px;border-radius:12px;background:#fff;object-fit:contain;">
+						<div>
+							<div style="font-size:1.15rem;font-weight:700;color:#d72660;">Knewton</div>
+							<div style="font-size:0.97rem;font-weight:400;color:#444;margin-top:4px;">
+								<span class="tabLabelEn">Adaptive learning technology for personalized education.</span>
+								<span class="tabLabelJa" style="display:none;">個別最適化学習のためのアダプティブラーニング技術。</span>
+							</div>
+						</div>
+					</div>
+				</a>
+			</div>
+				<button class="closeFullTabBtn" onclick="hideFullTabPage()" style="margin-top:48px;font-size:1.1rem;padding:0.7em 1.5em;border-radius:18px;border:none;background:#ff94b2;color:#d72660;box-shadow:0 1px 6px rgba(0,0,0,0.10);cursor:pointer;font-weight:900;">
+					<span class="closeLabelEn">Close</span><span class="closeLabelJa" style="display:none;">閉じる</span>
+				</button>
+			</div>
+		</div>
+		<div id="fullTab-widget" class="fullTabPage" style="display:none;position:fixed;top:90px;left:0;right:0;height:calc(100vh - 90px);background:#fff;z-index:20000;overflow:auto;">
+			<div style="max-width:900px;margin:48px auto;padding:48px 24px;">
+				<h1 style="color:#d72660;font-size:2.3rem;font-weight:900;margin-bottom:24px;">
+					<span class="tabLabelEn">Sources</span><span class="tabLabelJa" style="display:none;">出典</span>
+				</h1>
+				<div style="font-size:1.25rem;color:#444;">
+					出典のコンテンツ（全画面表示）
+				</div>
+				<button class="closeFullTabBtn" onclick="hideFullTabPage()" style="margin-top:48px;font-size:1.1rem;padding:0.7em 1.5em;border-radius:18px;border:none;background:#ff94b2;color:#d72660;box-shadow:0 1px 6px rgba(0,0,0,0.10);cursor:pointer;font-weight:900;">
+					<span class="closeLabelEn">Close</span><span class="closeLabelJa" style="display:none;">閉じる</span>
+				</button>
+			</div>
+		</div>
+	</div>
+	<!-- マップ本体（全画面） -->
+	<div id="map" style="position:fixed;top:90px;left:110px;right:0;height:calc(100vh - 90px);margin:0;padding:0;z-index:9999;"></div>
+	<!-- スタートアップ画面（タイトルボックス左寄せ、ボタンを下に移動） -->
+	<div id="coverPage" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:10000;display:flex;align-items:flex-start;justify-content:flex-start;background:#fff;transition:opacity 1s;">
+		<div style="margin-left:6vw;margin-top:6vh;display:flex;flex-direction:column;align-items:flex-start;z-index:2;">
+			<div id="coverBox" style="
+				background:#fff;
+				padding:64px 96px 64px 96px;
+				border-radius:44px;
+				box-shadow:0 12px 40px rgba(0,0,0,0.18);
+				max-width:800px;
+				min-width:380px;
+				text-align:left;
+				color:#d72660;
+				border-left:12px solid #ff94b2;
+				border-top:8px solid #ff94b2;
+				text-shadow: 2px 4px 16px rgba(255,148,178,0.13), 0 2px 8px #fff;
+				margin-bottom:32px;
+			">
+				<span id="coverTitleEn" style="font-size:2.7rem;font-weight:900;line-height:1.2;">Awakening the Citizen:<br>Mapping Education's Role<br>in Shaping Japan's Future</span>
+				<span id="coverTitleJa" style="font-size:2.7rem;font-weight:900;line-height:1.2;display:none;">市民の目覚め：<br>教育が描く<br>日本の未来地図</span>
+			</div>
+			<div style="display:flex;flex-direction:row;gap:18px;align-items:center;">
+				<button id="startButton" style="
+					font-size:1.7rem;
+					padding:1.1em 2.8em;
+					border-radius:32px;
+					border:none;
+					background:linear-gradient(90deg,#ff94b2 0%,#ffdbe8 100%);
+					color:#d72660;
+				 box-shadow:0 4px 24px rgba(0,0,0,0.18);
+					cursor:pointer;
+					font-weight:900;
+					letter-spacing:0.05em;
+					transition:background 0.2s,transform 0.1s;
+					font-family: inherit;
+					text-shadow: 2px 4px 16px rgba(255,148,178,0.18), 0 2px 8px #fff;
+				">Explore the Map</button>
+				<button id="langBtnCover" style="
+					font-size:1.1rem;
+					padding:0.7em 1.5em;
+					border-radius:18px;
+					border:none;
+					background:#fff;
+					color:#d72660;
+					box-shadow:0 1px 6px rgba(0,0,0,0.10);
+					cursor:pointer;
+					font-weight:900;
+					letter-spacing:0.01em;
+					transition:background 0.2s,transform 0.1s;
+					border:1px solid #bbb;
+					font-family: inherit;
+					text-shadow: 2px 4px 16px rgba(255,148,178,0.18), 0 2px 8px #fff;
+				">Eng/Jp</button>
+			</div>
+		</div>
+		<img src="YOUR_NEW_IMAGE.png" alt="Startup" style="width:100vw;height:100vh;object-fit:cover;display:block;position:absolute;top:0;left:0;z-index:1;">
+	</div>
+	<div style="position:absolute;top:10px;left:10px;z-index:10;">
+		<button id="lightBtn">ライト</button>
+		<button id="darkBtn">ダーク</button>
+		<button id="langBtn">Eng/Jp</button>
+	</div>
+	<script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+	<script>
+		const LIGHT_STYLE_JA = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+		const DARK_STYLE_JA = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+		const LIGHT_STYLE_EN = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json?lang=en';
+		const DARK_STYLE_EN = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style.json?lang=en';
+
+		let currentLang = 'en';
+		let currentStyle = 'light';
+
+		const START_TEXT = {
+			ja: '地図を見る',
+			en: 'Explore the Map'
+		};
+		const LIGHT_BTN_TEXT = {
+			ja: 'ライトモード',
+			en: 'Light Mode'
+		};
+		const DARK_BTN_TEXT = {
+			ja: 'ダークモード',
+			en: 'Dark Mode'
+		};
+
+		function getStyleUrl() {
+			if (currentLang === 'ja' && currentStyle === 'light') return LIGHT_STYLE_JA;
+			if (currentLang === 'ja' && currentStyle === 'dark') return DARK_STYLE_JA;
+			if (currentLang === 'en' && currentStyle === 'light') return LIGHT_STYLE_EN;
+			if (currentLang === 'en' && currentStyle === 'dark') return DARK_STYLE_EN;
+		}
+
+		const startButton = document.getElementById('startButton');
+		let map; // グローバルで宣言
+		let tabsOpen = true;
+		let currentTabIdx = 0;
+		let tabIntervalId = null;
+		const tabToggleBtn = document.getElementById('tabToggleBtn');
+		const tabBtns = document.querySelectorAll('.tabBtn');
+		const tabLabelEns = document.querySelectorAll('.tabLabelEn');
+		const tabLabelJas = document.querySelectorAll('.tabLabelJa');
+		const lightBtn = document.getElementById('lightBtn');
+		const darkBtn = document.getElementById('darkBtn');
+		const langBtn = document.getElementById('langBtn');
+		const langBtnCover = document.getElementById('langBtnCover');
+		const coverTitleEn = document.getElementById('coverTitleEn');
+		const coverTitleJa = document.getElementById('coverTitleJa');
+		const mainTitleEn = document.getElementById('mainTitleEn');
+		const mainTitleJa = document.getElementById('mainTitleJa');
+		const mainTitleBar = document.getElementById('mainTitle');
+		const mainTabs = document.getElementById('mainTabs');
+		const coverPage = document.getElementById('coverPage');
+		const tabContents = {
+			blog: document.getElementById('tabContent-blog'),
+			datas: document.getElementById('tabContent-datas'),
+			desc: document.getElementById('tabContent-desc'),
+			widget: document.getElementById('tabContent-widget')
+		};
+		const tabOrder = ['blog', 'datas', 'desc', 'widget']; // Mapを除外しBackgroundからスタート
+
+		function updateLangUI() {
+			startButton.textContent = START_TEXT[currentLang];
+			lightBtn.textContent = currentLang === 'ja' ? 'ライト' : 'Light';
+			darkBtn.textContent = currentLang === 'ja' ? 'ダーク' : 'Dark';
+			langBtn.textContent = 'Eng/Jp';
+			langBtnCover.textContent = 'Eng/Jp';
+			// タブラベル切り替え
+			if (currentLang === 'ja') {
+				tabLabelEns.forEach(el => el.style.display = 'none');
+				tabLabelJas.forEach(el => el.style.display = '');
+			} else {
+				tabLabelEns.forEach(el => el.style.display = '');
+				tabLabelJas.forEach(el => el.style.display = 'none');
+			}
+			if (currentLang === 'ja') {
+				coverTitleEn.style.display = 'none';
+				coverTitleJa.style.display = '';
+				mainTitleEn.style.display = 'none';
+				mainTitleJa.style.display = '';
+			} else {
+				coverTitleEn.style.display = '';
+				coverTitleJa.style.display = 'none';
+				mainTitleEn.style.display = '';
+				mainTitleJa.style.display = 'none';
+			}
+		}
+
+		lightBtn.onclick = () => {
+			currentStyle = 'light';
+			if (map) map.setStyle(getStyleUrl());
+		};
+		darkBtn.onclick = () => {
+			currentStyle = 'dark';
+			if (map) map.setStyle(getStyleUrl());
+		};
+		langBtn.onclick = function() {
+			currentLang = currentLang === 'ja' ? 'en' : 'ja';
+			updateLangUI();
+			if (map) map.setStyle(getStyleUrl());
+		};
+		langBtnCover.onclick = function() {
+			currentLang = currentLang === 'ja' ? 'en' : 'ja';
+			updateLangUI();
+			if (map) map.setStyle(getStyleUrl());
+		};
+
+		updateLangUI();
+
+		function addJapanFillLayer(map) {
+			// 既に追加済みならreturn
+			if (map.getSource('japan')) return;
+			map.addSource('japan', {
+				type: 'geojson',
+				data: 'https://raw.githubusercontent.com/dataofjapan/land/master/japan.geojson'
+			});
+			map.addLayer({
+				id: 'japan-fill',
+				type: 'fill',
+				source: 'japan',
+				paint: {
+					'fill-color': '#ffdbe8',
+					'fill-opacity': 0.7
+				}
+			});
+		}
+
+		function addVoterTurnoutLayer(map) {
+			const geojson = {
+				type: "FeatureCollection",
+				features: voterTurnoutData.map(d => ({
+					type: "Feature",
+					properties: {
+						country: d.country,
+						year: d.year,
+						rate: d.rate
+					},
+					geometry: {
+						type: "Point",
+						coordinates: [d.lng, d.lat]
+					}
+				}))
+			};
+			// ソースがなければ追加、あればsetData
+			if (!map.getSource('voter-turnout')) {
+				map.addSource('voter-turnout', {
+					type: 'geojson',
+					data: geojson
+				});
+			} else {
+				try {
+					map.getSource('voter-turnout').setData(geojson);
+				} catch (e) {
+					// まれに style 再設定直後に setData でエラーになる場合は再度 addSource
+					map.removeSource('voter-turnout');
+					map.addSource('voter-turnout', {
+						type: 'geojson',
+						data: geojson
+					});
+				}
+			}
+			// circleレイヤー
+			if (!map.getLayer('voter-turnout-circle')) {
+				map.addLayer({
+					id: 'voter-turnout-circle',
+					type: 'circle',
+					source: 'voter-turnout',
+					paint: {
+						'circle-radius': [
+							'interpolate', ['linear'], ['get', 'rate'],
+							50, 10,
+							80, 24
+						],
+						'circle-color': [
+							'interpolate', ['linear'], ['get', 'rate'],
+							50, '#ff94b2',
+							80, '#d72660'
+						],
+						'circle-opacity': 0.7,
+						'circle-stroke-width': 2,
+						'circle-stroke-color': '#fff'
+					}
+				});
+			}
+			// symbolレイヤー
+			if (!map.getLayer('voter-turnout-label')) {
+				map.addLayer({
+					id: 'voter-turnout-label',
+					type: 'symbol',
+					source: 'voter-turnout',
+					layout: {
+						'text-field': ['concat', ['get', 'country'], '\n', ['to-string', ['get', 'rate']], '%'],
+						'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+						'text-size': 14,
+						'text-offset': [0, 1.2],
+						'text-anchor': 'top'
+					},
+					paint: {
+						'text-color': '#d72660',
+						'text-halo-color': '#fff',
+						'text-halo-width': 2
+					}
+				});
+			}
+			// イベントは一度だけ登録
+			if (!map._voterTurnoutEvents) {
+				map.on('click', 'voter-turnout-circle', function(e) {
+					const f = e.features[0];
+					const html = `<strong>${f.properties.country}</strong><br>投票率: ${f.properties.rate}%<br>年: ${f.properties.year}`;
+					new maplibregl.Popup()
+						.setLngLat(f.geometry.coordinates)
+						.setHTML(html)
+						.addTo(map);
+				});
+				map.on('mouseenter', 'voter-turnout-circle', function() {
+					map.getCanvas().style.cursor = 'pointer';
+				});
+				map.on('mouseleave', 'voter-turnout-circle', function() {
+					map.getCanvas().style.cursor = '';
+				});
+				map._voterTurnoutEvents = true;
+			}
+		}
+
+		startButton.addEventListener('click', function() {
+			coverPage.style.opacity = '0';
+			setTimeout(() => {
+				coverPage.style.display = 'none';
+				mainTitleBar.style.display = 'flex';
+				mainTabs.style.display = 'flex';
+				if (!map) {
+					map = new maplibregl.Map({
+						container: 'map',
+						style: getStyleUrl(),
+						center: [147.7, 37.0],
+						zoom: 4.35
+					});
+					map.on('load', function() {
+						addJapanFillLayer(map);
+						addVoterTurnoutLayer(map);
+					});
+				} else {
+					map.setStyle(getStyleUrl());
+					map.once('styledata', function() {
+						addJapanFillLayer(map);
+						addVoterTurnoutLayer(map);
+					});
+				}
+				mainTabs.style.width = '44px';
+				tabToggleBtn.innerHTML = '→';
+				document.getElementById('tabBtnGroup').style.display = 'none';
+				mainTabs.querySelectorAll('button:not(#tabToggleBtn)').forEach(btn => btn.style.display = 'none');
+				tabsOpen = false;
+				currentTabIdx = 0;
+				showTab(tabOrder[0]);
+				startTabAutoSwitch();
+			}, 1000);
+		});
+		// --- Add back the showTab function and tab panel logic ---
+		function showTab(tabName) {
+			for (const key in tabContents) {
+				if (tabContents[key]) {
+					tabContents[key].style.display = (key === tabName) ? 'block' : 'none';
+				}
+			}
+			// Update tab button active state
+			tabBtns.forEach(btn => {
+				if (btn.dataset.tab === tabName) {
+					btn.style.color = '#d72660';
+					btn.style.fontWeight = '900';
+				} else {
+					btn.style.color = '#888';
+					btn.style.fontWeight = '700';
+				}
+			});
+		}
+
+		// Tab button click event
+		tabBtns.forEach((btn, idx) => {
+			btn.addEventListener('click', function() {
+				showTab(btn.dataset.tab);
+				currentTabIdx = idx;
+			});
+		});
+
+		// Tab auto switch logic (if you want to keep it)
+		function startTabAutoSwitch() {
+			if (tabIntervalId) clearInterval(tabIntervalId);
+			tabIntervalId = setInterval(() => {
+				if (!tabsOpen) {
+					currentTabIdx = (currentTabIdx + 1) % tabOrder.length;
+					showTab(tabOrder[currentTabIdx]);
+				}
+			}, 6000);
+		}
+
+		// Tab toggle button logic
+		tabToggleBtn.addEventListener('click', function() {
+			if (tabsOpen) {
+				mainTabs.style.width = '44px';
+				tabToggleBtn.innerHTML = '→';
+				document.getElementById('tabBtnGroup').style.display = 'none';
+				mainTabs.querySelectorAll('button:not(#tabToggleBtn)').forEach(btn => btn.style.display = 'none');
+				tabsOpen = false;
+			} else {
+				mainTabs.style.width = '110px';
+				tabToggleBtn.innerHTML = '≡';
+				document.getElementById('tabBtnGroup').style.display = '';
+				mainTabs.querySelectorAll('button:not(#tabToggleBtn)').forEach(btn => btn.style.display = '');
+				tabsOpen = true;
+			}
+		});
+	</script>
+</body>
+</html>

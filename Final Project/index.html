@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unseen Divide: A Map Revealing Japan's Civic Education Through Global Lenses</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIINfQRevNMKfU7C8FDJt0RWfHcdTbbQTQ=="
+     crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nEFhSBAxOQzYUZKI/MVsYcHzdKfZcWTzELb/0S0WQ=="
+     crossorigin=""></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="coverPage">
+        <div class="cover-background-image"></div>
+        <div class="cover-content">
+            <h1>Unseen Divide: A Map Revealing Japan's Civic Education Through Global Lenses</h1>
+            <p>Through conversations with friends from Japan, the U.S., and South Korea, I realized an 'unseen divide' in our perceptions of society and politics.</p>
+            <p>This map visualizes the regional differences in youth political participation in Japan and the civic education initiatives shaping it.</p>
+            <p>It also offers a global comparison, inviting us to reflect on our roles as citizens in an interconnected world.</p>
+            <button id="startButton">Explore the Map</button>
+        </div>
+    </div>
+
+    <h1>Unseen Divide: A Map Revealing Japan's Civic Education Through Global Lenses</h1> <div id="map"></div>
+
+    <div id="controls">
+        <button id="showComparisonBtn">View International Comparison</button>
+    </div>
+    <div id="comparisonPanel" style="display:none;">
+        <h2>International Comparison Data</h2>
+        <h3>Youth Voter Turnout</h3>
+        <table id="voteRateTable">
+            <thead><tr><th>Country</th><th>Turnout (%)</th><th>Year</th></tr></thead>
+            <tbody></tbody>
+        </table>
+        <h3>Higher Education Enrollment Rate</h3>
+        <table id="eduEnrollTable">
+            <thead><tr><th>Country</th><th>Enrollment (%)</th><th>Year</th></tr></thead>
+            <tbody></tbody>
+        </table>
+        <p class="source">※ Comparison data may be based on different criteria than Japan's regional data.</p>
+        <button id="hideComparisonBtn">Close</button>
+    </div>
+
+    <div id="info">
+        <p>This map visualizes regional differences in youth political participation in Japan and the civic education initiatives shaping it, inspired by observations from exchanges with friends from Japan, the U.S., and South Korea.</p>
+        <p>Click on prefectures in Japan for local voter turnout data, and on education icons for details on specific initiatives. Use the "View International Comparison" button above to compare data with the U.S. and South Korea.</p>
+        <p class="source">Data Sources: Geospatial Information Authority of Japan, Ministry of Internal Affairs and Communications (Japan), OECD Statistics, various national education and election authorities.</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

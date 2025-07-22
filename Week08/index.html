@@ -25,7 +25,7 @@
 		<script>
 			const map = new maplibregl.Map({
 				container: 'map',
-				style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+				style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
 				center: [142.50, 43.01],
 				zoom: 8.5
 			});
@@ -46,48 +46,22 @@
 							['linear'],
 							['get', 'T001100001'],
 							0,
-							'#fac6e5',
+							'#ffdbe8',
 							5000,
-							'#fc89c3',
+							'#ff9482',
 							10000,
-							'#de3871',
+							'#f24455',
 							15000,
-							'#9e0232',
+							'#660f24',
 							20000,
-							'#4c0811'
+							'#ff1cc0'
 						],
 						'fill-opacity': 0.75,
-						'fill-outline-color': '#0000ff'
+						'fill-outline-color': '#efd4c4'
+                    
+                        
+                        
 					}
-				});
-
-				// Hover用の空のフィルター付きレイヤーを追加
-				map.addLayer({
-					id: 'population-layer-hover',
-					type: 'line',
-					source: 'hokkaido',
-					paint: {
-						'line-color': '#ffff00',
-						'line-width': 3
-					},
-					filter: ['==', ['get', 'meshcode'], ''] // ←ここを修正
-				});
-
-				let hoveredMeshcode = null;
-
-				map.on('mousemove', 'population-layer', (e) => {
-					if (e.features.length > 0) {
-						const meshcode = e.features[0].properties.meshcode; // ←ここを修正
-						if (hoveredMeshcode !== meshcode) {
-							hoveredMeshcode = meshcode;
-							map.setFilter('population-layer-hover', ['==', ['get', 'meshcode'], hoveredMeshcode]); // ←ここを修正
-						}
-					}
-				});
-
-				map.on('mouseleave', 'population-layer', () => {
-					hoveredId = meshcode = null;
-					map.setFilter('population-layer-hover', ['==', 'id', '']);
 				});
 			});
 		</script>
